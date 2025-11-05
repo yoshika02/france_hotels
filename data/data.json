@@ -1,0 +1,142 @@
+[
+  {
+    "id": 1,
+    "name": "Hotel Le Marais",
+    "location": "Paris, Ile-de-France",
+    "price": 150,
+    "rating": 4.5
+  },
+  {
+    "id": 2,
+    "name": "Le Jardin d'Acclimatation",
+    "location": "Lyon, Rhône-Alpes",
+    "price": 200,
+    "rating": 4.8
+  },
+  {
+    "id": 3,
+    "name": "Hotel du Louvre",
+    "location": "Paris, Ile-de-France",
+    "price": 250,
+    "rating": 4.7
+  },
+  {
+    "id": 4,
+    "name": "Hotel Saint-Germain",
+    "location": "Paris, Ile-de-France",
+    "price": 180,
+    "rating": 4.3
+  },
+  {
+    "id": 5,
+    "name": "The Ritz Paris",
+    "location": "Paris, Ile-de-France",
+    "price": 500,
+    "rating": 5
+  },
+  {
+    "id": 6,
+    "name": "Hotel Mercure Le Havre",
+    "location": "Le Havre, Normandy",
+    "price": 120,
+    "rating": 4.2
+  },
+  {
+    "id": 7,
+    "name": "Hotel Monte Carlo",
+    "location": "Nice, Provence-Alpes-Côte d'Azur",
+    "price": 300,
+    "rating": 4.6
+  },
+  {
+    "id": 8,
+    "name": "Best Western Premier Hotel Opéra",
+    "location": "Paris, Ile-de-France",
+    "price": 210,
+    "rating": 4.4
+  },
+  {
+    "id": 9,
+    "name": "Hôtel des Arts",
+    "location": "Marseille, Provence-Alpes-Côte d'Azur",
+    "price": 160,
+    "rating": 4.1
+  },
+  {
+    "id": 10,
+    "name": "Grand Hotel de Bordeaux",
+    "location": "Bordeaux, Nouvelle-Aquitaine",
+    "price": 350,
+    "rating": 4.9
+  },
+  {
+    "id": 11,
+    "name": "Hotel Pullman Eiffel",
+    "location": "Paris, Ile-de-France",
+    "price": 320,
+    "rating": 4.7
+  },
+  {
+    "id": 12,
+    "name": "Hotel La Mirande",
+    "location": "Avignon, Provence",
+    "price": 270,
+    "rating": 4.6
+  },
+  {
+    "id": 13,
+    "name": "Hotel Barriere Le Majestic",
+    "location": "Cannes, Côte d'Azur",
+    "price": 450,
+    "rating": 4.9
+  },
+  {
+    "id": 14,
+    "name": "Hotel Regina Louvre",
+    "location": "Paris, Ile-de-France",
+    "price": 295,
+    "rating": 4.4
+  },
+  {
+    "id": 15,
+    "name": "Hotel Le Negresco",
+    "location": "Nice, Provence-Alpes-Côte d'Azur",
+    "price": 390,
+    "rating": 5
+  },
+  {
+    "id": 16,
+    "name": "Hotel Oceania Saint Malo",
+    "location": "Saint-Malo, Brittany",
+    "price": 175,
+    "rating": 4.3
+  },
+  {
+    "id": 17,
+    "name": "Hotel Carlton Lyon",
+    "location": "Lyon, Rhône-Alpes",
+    "price": 230,
+    "rating": 4.5
+  },
+  {
+    "id": 18,
+    "name": "Hotel du Palais",
+    "location": "Biarritz, Nouvelle-Aquitaine",
+    "price": 480,
+    "rating": 4.8
+  },
+  {
+    "id": 19,
+    "name": "Hotel d’Europe",
+    "location": "Avignon, Provence",
+    "price": 260,
+    "rating": 4.6
+  },
+  {
+    "id": 20,
+    "name": "Hotel Les Roches Blanches",
+    "location": "Cassis, Provence-Alpes-Côte d'Azur",
+    "price": 420,
+    "rating": 4.9
+  }
+]
