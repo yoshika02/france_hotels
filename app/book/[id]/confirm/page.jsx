@@ -1,5 +1,6 @@
 "use client";
 
+
 import { use } from "react";
 import { useState } from "react";
 import hotels from "../../../../data/data.json";
@@ -20,19 +21,49 @@ export default function ConfirmBookingPage(props) {
     guests: 1,
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ✅ Save booking details in localStorage for Payment Page
-    localStorage.setItem(
-      "bookingDetails",
-      JSON.stringify({ ...form, hotelId })
-    );
+    // Generate unique booking ID
+    const bookingId = "BK-" + Date.now().toString().slice(-6);
 
-    // ✅ Redirect to Payment Page
-    router.push(`/pay/${hotelId}`);
+    // Prepare data to save
+    const bookingDetails = {
+      bookingId,
+      hotelId,
+      hotelName: hotel?.name || "Unknown",
+      location: hotel?.location || "N/A",
+      name: form.name,
+      checkin: form.checkin,
+      checkout: form.checkout,
+      guests: form.guests,
+      price: hotel?.price || 0,
+      date: new Date().toLocaleString(),
+    };
+
+    // ✅ Save to Google Sheets
+    try {
+      await fetch(
+        "https://script.google.com/macros/s/AKfycbwRH99ubaIzTrBdyYe_ootZOdOLhz3Cj5fKUfyi3if9nCvoy4fRJBbtd-ImVJfNE3f4/execc",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(bookingDetails),
+        }
+      );
+
+      // ✅ Save to localStorage for Payment Page
+      localStorage.setItem("bookingDetails", JSON.stringify(bookingDetails));
+
+      alert("✅ Booking confirmed & saved successfully!");
+      router.push(`/pay/${hotelId}`);
+    } catch (error) {
+      console.error("❌ Error saving to Google Sheets:", error);
+      alert("Could not save booking data.");
+    }
   };
 
+  
   return (
     <main className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 flex justify-center items-center p-8">
       <div className="bg-white/80 backdrop-blur-md shadow-2xl rounded-3xl p-8 max-w-md w-full border border-pink-100 transition-all hover:shadow-pink-200">
@@ -43,6 +74,14 @@ export default function ConfirmBookingPage(props) {
         <h2 className="text-lg font-semibold text-center text-pink-600 mb-6">
           {hotel?.name || "Hotel Not Found"}
         </h2>
+
+        {/* Hotel Summary */}
+        <div className="text-center mb-6 border-b pb-4">
+          <p className="text-gray-700 font-medium">{hotel?.location}</p>
+          <p className="text-pink-500 font-semibold">
+            €{hotel?.price} / night
+          </p>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
