@@ -1,102 +1,87 @@
 "use client";
+import { useEffect, useState } from "react";
 
-import { useState } from "react";
+export default function ConfirmPage({ params }) {
+  const { id } = params;
+  const [hotel, setHotel] = useState(null);
+  const [hydrated, setHydrated] = useState(false);
 
-export default function ConfirmPage() {
-  const [name, setName] = useState("");
-  const [checkin, setCheckin] = useState("");
-  const [checkout, setCheckout] = useState("");
-  const [guests, setGuests] = useState(1);
+  useEffect(() => {
+    setHydrated(true); // Wait until client-side hydration finishes
+  }, []);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    const savedHotel = localStorage.getItem("selectedHotel");
+    if (savedHotel) {
+      const parsed = JSON.parse(savedHotel);
+      if (parsed.id === Number(id)) {
+        setHotel(parsed);
+      }
+    }
+  }, [id]);
 
-    // Save booking details to localStorage (to use on success page)
-    const hotel = JSON.parse(localStorage.getItem("selectedHotel"));
+  if (!hydrated) {
+    // Prevent SSR mismatch by not rendering inputs until client is ready
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100">
+        <h2 className="text-indigo-600 font-semibold text-xl">
+          Initializing booking page…
+        </h2>
+      </main>
+    );
+  }
 
-localStorage.setItem(
-  "bookingDetails",
-  JSON.stringify({ name, checkin, checkout, guests, hotel })
-);
-
-window.location.href = `/pay/${hotel.id}`
-;
-
-  };
+  if (!hotel)
+    return (
+      <h1 className="text-center p-10 text-gray-600">Loading booking...</h1>
+    );
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100 p-10 flex justify-center">
-      <div className="bg-white shadow-xl rounded-3xl p-8 max-w-lg w-full">
-        <h1 className="text-3xl font-bold text-center text-indigo-600 mb-6">
-          🧳 Confirm Your Booking
+    <main className="min-h-screen flex justify-center items-center bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 p-6">
+      <div className="bg-white shadow-xl rounded-3xl p-10 max-w-md w-full text-center">
+        <h1 className="text-3xl font-bold text-indigo-600 mb-4">
+          🧳 Confirm Booking
         </h1>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="block mb-1 font-medium text-gray-700">
-              Full Name
-            </label>
-            <input
-              type="text"
-              required
-              className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400 outline-none"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter your full name"
-            />
-          </div>
+        <p className="text-lg font-medium text-gray-700 mb-2">
+          <strong>Hotel:</strong> {hotel.name}
+        </p>
 
-          <div>
-            <label className="block mb-1 font-medium text-gray-700">
-              Check-in Date
-            </label>
-            <input
-              type="date"
-              required
-              className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400 outline-none"
-              value={checkin}
-              onChange={(e) => setCheckin(e.target.value)}
-            />
-          </div>
+        <p className="text-gray-700 mb-2">
+          <strong>Location:</strong> {hotel.location}
+        </p>
 
-          <div>
-            <label className="block mb-1 font-medium text-gray-700">
-              Check-out Date
-            </label>
-            <input
-              type="date"
-              required
-              className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400 outline-none"
-              value={checkout}
-              onChange={(e) => setCheckout(e.target.value)}
-            />
-          </div>
+        <p className="text-gray-700 mb-4">
+          <strong>Price:</strong> €{hotel.price}
+        </p>
 
-          <div>
-            <label className="block mb-1 font-medium text-gray-700">
-              Number of Guests
-            </label>
-            <input
-              type="number"
-              required
-              min={1}
-              className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400 outline-none"
-              value={guests}
-              onChange={(e) => setGuests(e.target.value)}
-            />
-          </div>
+        <p className="text-gray-500 text-sm mb-6">
+          Review your booking before proceeding to payment.
+        </p>
 
+        <div className="flex justify-center mt-6">
           <button
-            type="submit"
-            className="w-full py-3 bg-gradient-to-r from-indigo-500 to-pink-500 text-white text-lg rounded-xl font-medium shadow-md hover:opacity-90 transition"
+            onClick={() => {
+              localStorage.setItem(
+                "selectedHotel",
+                JSON.stringify({
+                  id: hotel.id,
+                  name: hotel.name,
+                  location: hotel.location,
+                  price: hotel.price,
+                })
+              );
+              window.location.href = `/pay/${hotel.id}`;
+            }}
+            className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-pink-500 text-white rounded-xl font-medium shadow hover:opacity-90 transition"
           >
-            ✅ Confirm Booking
+            Proceed to Payment 💳
           </button>
-        </form>
+        </div>
 
         <a
           href="/"
-          className="block text-center mt-4 text-gray-600 hover:underline"
+          className="block mt-6 text-gray-600 hover:text-indigo-600 transition"
         >
           ← Cancel & Return Home
         </a>
