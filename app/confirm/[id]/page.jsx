@@ -53,26 +53,44 @@ export default function ConfirmPage({ params }) {
   }, [id]);
 
   // 🧾 Handle confirm
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!hotel) {
       alert("Error: Hotel data not loaded.");
       return;
     }
 
-    // Save booking details for next page
+    // 🧠 Prepare booking data
     const bookingDetails = {
       name,
+      hotel: hotel.name,
+      location: hotel.location,
       checkin,
       checkout,
       guests,
-      hotel,
+      price: hotel.price,
     };
 
-    localStorage.setItem("bookingDetails", JSON.stringify(bookingDetails));
+    try {
+      // ✅ Send booking to Google Sheets (replace URL with yours)
+      await fetch("https://script.google.com/macros/s/AKfycbxB6BUWqoLqmnGsJdBGgSogcxM20Ce9r0_v5NO1oLgClfArDYewAuRZaDQQPSSb5okS/exec", {
+        method: "POST",
+        mode: "no-cors", // required for Apps Script
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(bookingDetails),
+      });
 
-    // ✅ Navigate to payment page
-    router.push(`/pay/${hotel.id}`);
+      // Save booking for next page
+      localStorage.setItem("bookingDetails", JSON.stringify(bookingDetails));
+
+      alert("✅ Booking saved successfully!");
+      router.push(`/pay/${hotel.id}`);
+    } catch (err) {
+      console.error("❌ Error saving to Google Sheets:", err);
+      alert("Could not save booking data.");
+    }
   };
 
   if (loading) {

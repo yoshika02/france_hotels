@@ -74,7 +74,3 @@ export default function PaymentPage() {
     </main>
   );
 }
-
-
-
-
