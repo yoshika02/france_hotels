@@ -1,102 +1,78 @@
 "use client";
 
 import { useEffect, useState } from "react";
-// Make sure to import supabase if you need to fetch
-import { supabase } from "../../../lib/supabaseClient"; 
+import { useRouter } from "next/navigation";
 
-// 1. Correctly accept { params }
 export default function ConfirmPage({ params }) {
-  const { id } = params; // Get ID from the URL
-
-  // 2. Add state for the hotel itself
-  const [hotel, setHotel] = useState(null);
-
+  const router = useRouter();
+  const { id } = params;
   const [name, setName] = useState("");
   const [checkin, setCheckin] = useState("");
   const [checkout, setCheckout] = useState("");
   const [guests, setGuests] = useState(1);
+  const [hotel, setHotel] = useState(null);
+  const [hydrated, setHydrated] = useState(false);
 
-  // 3. Load hotel data on page load
+  // ✅ Wait until client is ready before accessing localStorage
   useEffect(() => {
-    async function loadHotel() {
-      if (!id) return; // Wait for the id
-
-      // Try localStorage first
-      const saved = localStorage.getItem("selectedHotel");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        // Check if the saved hotel matches the ID in the URL
-        if (parsed.id.toString() === id) {
-          setHotel(parsed);
-          return;
-        }
-      }
-
-      // If not in localStorage (or it's the wrong hotel), fetch from DB
-      // This makes the page work on refresh
-      console.log("Fetching hotel from DB as it's not in localStorage...");
-      const { data, error } = await supabase
-        .from("hotels") // Assuming table name is 'hotels'
-        .select("*")
-        .eq("id", id)
-        .maybeSingle();
-
-      if (error) {
-        console.error("Error fetching hotel:", error);
-        alert("Error: Could not load hotel data.");
-        window.location.href = "/"; // Go home if hotel can't be found
-      } else {
-        setHotel(data);
-        // Also save it to localStorage for the *next* step (pay page)
-        localStorage.setItem("selectedHotel", JSON.stringify(data));
-      }
+    setHydrated(true);
+    const storedHotel = localStorage.getItem("selectedHotel");
+    if (storedHotel) {
+      const parsed = JSON.parse(storedHotel);
+      setHotel(parsed);
     }
-
-    loadHotel();
-  }, [id]); // Dependency array ensures this runs when 'id' is available
+  }, []);
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    // 4. Check if hotel loaded before submitting
-    if (!hotel) {
-      alert("Error: Hotel data is still loading or could not be found.");
-      return;
-    }
-
-    // Save booking details to localStorage (to use on success page)
-    localStorage.setItem(
-      "bookingDetails",
-      JSON.stringify({ name, checkin, checkout, guests, hotel })
-    );
-
-    // 5. This will now work, as 'hotel' is from state
-    window.location.href = `/pay/${hotel.id}`;
-  };
-
-  // Show loading state while hotel is fetched
-  if (!hotel) {
-    return (
-      <h1 className="text-center p-10 text-2xl font-semibold">
-        Loading Hotel Details...
-      </h1>
-    );
+  const hotel = JSON.parse(localStorage.getItem("selectedHotel"));
+  if (!hotel || !hotel.id) {
+    alert("⚠️ Hotel information is missing. Please go back and select a hotel again.");
+    window.location.href = "/";
+    return;
   }
 
-  // --- Render the form (your JSX, unchanged) ---
+  localStorage.setItem(
+    "bookingDetails",
+    JSON.stringify({ name, checkin, checkout, guests, hotel })
+  );
+
+  window.location.href = `/pay/${hotel.id}`;
+};
+
+
+  if (!hydrated)
+    return (
+      <h1 className="text-center text-purple-600 p-10">Loading booking form…</h1>
+    );
+
+  if (!hotel)
+    return (
+      <main className="min-h-screen flex justify-center items-center bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100">
+        <div className="bg-white p-8 rounded-3xl shadow-xl text-center">
+          <h2 className="text-xl font-bold text-indigo-600 mb-3">
+            No Hotel Selected
+          </h2>
+          <p className="text-gray-600 mb-4">
+            Please go back and select a hotel to continue.
+          </p>
+          <a
+            href="/"
+            className="px-5 py-2 bg-indigo-500 text-white rounded-xl shadow-md hover:opacity-90"
+          >
+            Go Home
+          </a>
+        </div>
+      </main>
+    );
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100 p-10 flex justify-center">
       <div className="bg-white shadow-xl rounded-3xl p-8 max-w-lg w-full">
         <h1 className="text-3xl font-bold text-center text-indigo-600 mb-6">
           🧳 Confirm Your Booking
         </h1>
-        
-        {/* You can show hotel details here too */}
-        <div className="text-center mb-4 border-b pb-4">
-            <p className="text-xl font-bold text-gray-800">{hotel.name}</p>
-            <p className="text-gray-500">{hotel.location}</p>
-            <p className="text-lg font-semibold text-pink-600">€{hotel.price} / night</p>
-        </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>

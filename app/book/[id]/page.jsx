@@ -114,9 +114,16 @@ export default async function BookingPage(props) {
                 <div style={{ fontSize: 13, color: "#9AA3B2" }}>From</div>
                 <div style={{ fontSize: 22, fontWeight: 700, color: "#2B6BC6", marginTop: 6 }}>€{hotel.price}</div>
                 <div style={{ marginTop: 12 }}>
-                  <Link href={`/book/${hotel.id}/confirm`} style={{ display: "block", padding: "10px 12px", background: "linear-gradient(90deg,#FF8AA1,#6BA8FF)", color: "white", borderRadius: 10, textAlign: "center", textDecoration: "none", fontWeight: 700 }}>
-                    Continue to Booking
-                  </Link>
+                  <Link
+  href={`/confirm/${hotel.id}`}
+  onClick={() => {
+    localStorage.setItem("selectedHotel", JSON.stringify(hotel));
+  }}
+  className="block mt-4 px-6 py-3 bg-gradient-to-r from-indigo-500 to-pink-500 text-white text-center rounded-xl shadow hover:opacity-90 transition"
+>
+  Continue to Booking
+</Link>
+
                   <Link href="/" style={{ display: "block", padding: "10px 12px", marginTop: 10, background: "#F3F4F6", color: "#1F2937", borderRadius: 10, textAlign: "center", textDecoration: "none", fontWeight: 600 }}>
                     Back to Home
                   </Link>
