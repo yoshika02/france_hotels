@@ -1,6 +1,5 @@
 "use client";
 
-
 import { use } from "react";
 import { useState } from "react";
 import hotels from "../../../../data/data.json";
@@ -41,10 +40,10 @@ export default function ConfirmBookingPage(props) {
       date: new Date().toLocaleString(),
     };
 
-    // ✅ Save to Google Sheets
+    // ✅ Save via your Next.js API route (to fix CORS)
     try {
       await fetch(
-        "https://script.google.com/macros/s/AKfycbwRH99ubaIzTrBdyYe_ootZOdOLhz3Cj5fKUfyi3if9nCvoy4fRJBbtd-ImVJfNE3f4/execc",
+        "/api/save-booking", // <-- CHANGED
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -58,12 +57,11 @@ export default function ConfirmBookingPage(props) {
       alert("✅ Booking confirmed & saved successfully!");
       router.push(`/pay/${hotelId}`);
     } catch (error) {
-      console.error("❌ Error saving to Google Sheets:", error);
+      console.error("❌ Error saving booking:", error); // <-- CHANGED
       alert("Could not save booking data.");
     }
   };
 
-  
   return (
     <main className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 flex justify-center items-center p-8">
       <div className="bg-white/80 backdrop-blur-md shadow-2xl rounded-3xl p-8 max-w-md w-full border border-pink-100 transition-all hover:shadow-pink-200">
@@ -95,6 +93,7 @@ export default function ConfirmBookingPage(props) {
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-400 outline-none"
+              suppressHydrationWarning={true} /* ✅ Hydration Fix */
             />
           </div>
 
@@ -108,6 +107,7 @@ export default function ConfirmBookingPage(props) {
               value={form.checkin}
               onChange={(e) => setForm({ ...form, checkin: e.target.value })}
               className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-400 outline-none"
+              suppressHydrationWarning={true} /* ✅ Hydration Fix */
             />
           </div>
 
@@ -121,6 +121,7 @@ export default function ConfirmBookingPage(props) {
               value={form.checkout}
               onChange={(e) => setForm({ ...form, checkout: e.target.value })}
               className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-400 outline-none"
+              suppressHydrationWarning={true} /* ✅ Hydration Fix */
             />
           </div>
 
@@ -135,6 +136,7 @@ export default function ConfirmBookingPage(props) {
               value={form.guests}
               onChange={(e) => setForm({ ...form, guests: e.target.value })}
               className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-400 outline-none"
+              suppressHydrationWarning={true} /* ✅ Hydration Fix */
             />
           </div>
 
