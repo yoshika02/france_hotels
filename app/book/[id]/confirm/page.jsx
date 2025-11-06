@@ -1,28 +1,71 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
-export default function ConfirmPage() {
+export default function ConfirmPage({ params }) {
+  const router = useRouter();
+  const { id } = params;
   const [name, setName] = useState("");
   const [checkin, setCheckin] = useState("");
   const [checkout, setCheckout] = useState("");
   const [guests, setGuests] = useState(1);
+  const [hotel, setHotel] = useState(null);
+  const [hydrated, setHydrated] = useState(false);
+
+  // ✅ Wait until client is ready before accessing localStorage
+  useEffect(() => {
+    setHydrated(true);
+    const storedHotel = localStorage.getItem("selectedHotel");
+    if (storedHotel) {
+      const parsed = JSON.parse(storedHotel);
+      setHotel(parsed);
+    }
+  }, []);
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    // Save booking details to localStorage (to use on success page)
-    const hotel = JSON.parse(localStorage.getItem("selectedHotel"));
+  const hotel = JSON.parse(localStorage.getItem("selectedHotel"));
+  if (!hotel || !hotel.id) {
+    alert("⚠️ Hotel information is missing. Please go back and select a hotel again.");
+    window.location.href = "/";
+    return;
+  }
 
-localStorage.setItem(
-  "bookingDetails",
-  JSON.stringify({ name, checkin, checkout, guests, hotel })
-);
+  localStorage.setItem(
+    "bookingDetails",
+    JSON.stringify({ name, checkin, checkout, guests, hotel })
+  );
 
-window.location.href = `/pay/${hotel.id}`
-;
+  window.location.href = `/pay/${hotel.id}`;
+};
 
-  };
+
+  if (!hydrated)
+    return (
+      <h1 className="text-center text-purple-600 p-10">Loading booking form…</h1>
+    );
+
+  if (!hotel)
+    return (
+      <main className="min-h-screen flex justify-center items-center bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100">
+        <div className="bg-white p-8 rounded-3xl shadow-xl text-center">
+          <h2 className="text-xl font-bold text-indigo-600 mb-3">
+            No Hotel Selected
+          </h2>
+          <p className="text-gray-600 mb-4">
+            Please go back and select a hotel to continue.
+          </p>
+          <a
+            href="/"
+            className="px-5 py-2 bg-indigo-500 text-white rounded-xl shadow-md hover:opacity-90"
+          >
+            Go Home
+          </a>
+        </div>
+      </main>
+    );
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100 p-10 flex justify-center">
