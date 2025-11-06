@@ -7,7 +7,7 @@ export default function ConfirmPage({ params }) {
   const { id } = params;
   const [hotel, setHotel] = useState(null);
 
-  useEffect(() => {
+ useEffect(() => {
     async function load() {
       const {
         data: { user },
@@ -24,23 +24,31 @@ export default function ConfirmPage({ params }) {
 
       if (selected) {
         const info = JSON.parse(selected);
-        if (info.id === Number(id)) {
+        // Make sure to compare numbers to numbers or strings to strings
+        // params.id is a string, so info.id should be compared as one.
+        if (info.id.toString() === id) {
           setHotel(info);
           return;
         }
       }
 
       // If not found locally, fallback -> fetch from DB
-      const { data } = await supabase
-        .from("bookings")
+      // ✅ CORRECTED QUERY
+      const { data, error } = await supabase
+        .from("hotels")   // <-- ASSUMING YOUR TABLE IS NAMED "hotels"
         .select("*")
-        .eq("hotel_id", id)
+        .eq("id", id)     // <-- Match the hotel's 'id'
         .maybeSingle();
 
+      if (error) {
+        console.error("Error fetching hotel:", error);
+      }
+      
       setHotel(data);
     }
     load();
   }, [id]);
+      // If not found locally, fallback -> fetch from DB
 
   if (!hotel) return <h1 className="text-center p-10">Loading booking details...</h1>;
 
