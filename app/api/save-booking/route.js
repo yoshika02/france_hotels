@@ -3,31 +3,72 @@ import { NextResponse } from "next/server";
 
 export async function POST(request) {
   try {
-    // 1. Get the booking data from the front-end
     const bookingDetails = await request.json();
-    
-    // 2. PASTE YOUR GOOGLE SCRIPT URL HERE
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRH99ubaIzTrBdyYe_ootZOdOLhz3Cj5fKUfyi3if9nCvoy4fRJBbtd-ImVJfNE3f4/execc";
+    console.log("🟢 Received booking data:", bookingDetails);
 
-    // 3. Send the data to Google Sheets from the server
+    // ✅ Normalize field names to handle both camelCase & snake_case
+    const normalized = {
+      booking_id: bookingDetails.booking_id || bookingDetails.bookingId,
+      hotel_id: bookingDetails.hotel_id || bookingDetails.hotelId,
+      hotel_name: bookingDetails.hotel_name || bookingDetails.hotelName,
+      location: bookingDetails.location || "Not provided",
+      name: bookingDetails.name,
+      checkin: bookingDetails.checkin,
+      checkout: bookingDetails.checkout,
+      guests: bookingDetails.guests || 1,
+      price: bookingDetails.price,
+      date: bookingDetails.date || new Date().toLocaleString(),
+    };
+
+    console.log("📦 Normalized booking data:", normalized);
+
+    // ✅ Validate required fields
+    const requiredFields = [
+      "booking_id",
+      "hotel_id",
+      "hotel_name",
+      "name",
+      "checkin",
+      "checkout",
+      "guests",
+      "price",
+      "date",
+    ];
+
+    const missing = requiredFields.filter((key) => !normalized[key]);
+    if (missing.length > 0) {
+      console.error("❌ Missing required fields:", missing);
+      return NextResponse.json(
+        { message: `Missing required fields: ${missing.join(", ")}` },
+        { status: 400 }
+      );
+    }
+
+    // ✅ Correct Google Apps Script endpoint (no double c)
+    const GOOGLE_SCRIPT_URL =
+      "https://script.google.com/macros/s/AKfycbwRH99ubaIzTrBdyYe_ootZOdOLhz3Cj5fKUfyi3if9nCvoy4fRJBbtd-ImVJfNE3f4/exec";
+
+    // ✅ Send data to Google Sheets via Apps Script
     const response = await fetch(GOOGLE_SCRIPT_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(bookingDetails),
+      body: JSON.stringify(normalized),
     });
 
     if (!response.ok) {
-      // If Google's response is not a 2xx, throw an error
-      const errorText = await response.text();
-      throw new Error(`Google Script failed: ${response.status} ${errorText}`);
+      throw new Error("❌ Failed to save to Google Sheets");
     }
 
-    // 4. Send a success response back to the front-end
-    return NextResponse.json({ message: "Booking saved successfully" }, { status: 200 });
-
+    console.log("✅ Booking saved successfully to Google Sheets!");
+    return NextResponse.json(
+      { message: "Booking saved successfully!" },
+      { status: 200 }
+    );
   } catch (error) {
-    // 5. Send an error response back to the front-end
-    console.error("API Route Error:", error.message);
-    return NextResponse.json({ message: "Error saving booking", error: error.message }, { status: 500 });
+    console.error("❌ API Route Error:", error);
+    return NextResponse.json(
+      { message: "Error saving booking", error: error.message },
+      { status: 500 }
+    );
   }
 }
